@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "516414892771",
+    "firebase_url": "https://flow-7cdb4.firebaseio.com",
+    "project_id": "flow-7cdb4",
+    "storage_bucket": "flow-7cdb4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516414892771:android:582b47709f10ccda",
+        "android_client_info": {
+          "package_name": "com.justinraczak.android.flow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "516414892771-ffktpkdno3r4dqso8h17clap755v7scd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.justinraczak.android.flow",
+            "certificate_hash": "05b031779931e686bf3b03a73841227da43f6181"
+          }
+        },
+        {
+          "client_id": "516414892771-hc6o66qermj3hiunbtk5lnmfsuqfc7qg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_YBkzqvoGG7L2rHH2eQSCKTYCICnR9KA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "516414892771-hc6o66qermj3hiunbtk5lnmfsuqfc7qg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
