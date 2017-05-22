@@ -147,6 +147,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             // Creation successful, sign the user into the app
                             Log.d(TAG, "createUserWithEmail: successful");
                             FirebaseUser user = mAuth.getCurrentUser();
+
+                            // Save the new user to Firebase
+                            Log.d(TAG, "Calling Utils to save new user to Firebase");
+                            Utils.writeNewUserToFirebase(user.getUid(), user.getEmail());
+
                             Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
                             startActivity(dayViewIntent);
                         } else {
@@ -411,6 +416,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //    }
             //}
 
+
+
+            // TODO: register the new account here.
+            createAccount(mEmail, mPassword);
+
             mAuth.signInWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -429,8 +439,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         }
                     });
 
-            // TODO: register the new account here.
-            createAccount(mEmail, mPassword);
             return true;
         }
 
