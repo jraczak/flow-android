@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser != null) {
-            Intent dayViewIntent = new Intent(LoginActivity.this, DayViewActivity.class);
+            Intent dayViewIntent = new Intent(LoginActivity.this, TaskViewActivity.class);
             startActivity(dayViewIntent);
         }
 
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             // Creation successful, sign the user into the app
                             Log.d(TAG, "createUserWithEmail: successful");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent dayViewIntent = new Intent(getApplicationContext(), DayViewActivity.class);
+                            Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
                             startActivity(dayViewIntent);
                         } else {
                            // Creation failed, handle the error
@@ -417,10 +417,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                            if (task.isSuccessful()) {
-                                Intent dayViewIntent = new Intent(getApplicationContext(), DayViewActivity.class);
-                                startActivity(dayViewIntent);
-                            }
+                            //if (task.isSuccessful()) {
+                            //    Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
+                            //    startActivity(dayViewIntent);
+                            //}
                             if (!task.isSuccessful()) {
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
                                 Toast.makeText(LoginActivity.this, "Unfortunately, sign in failed",
@@ -440,6 +440,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
+                startActivity(dayViewIntent);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

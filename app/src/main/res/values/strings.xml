@@ -16,6 +16,10 @@
     <string name="lets_go">LET\'S GO</string>
     <!-- END WELCOME STRINGS -->
 
+    <!-- TASK VIEW STRINGS -->
+    <string name="today">Today</string>
+    <!-- END TASK VIEW STRINGS -->
+
     <!-- CONTENT DESCRIPTION STRINGS -->
     <string name="cont_desc_next">next</string>
     <string name="cont_desc_finish">finish</string>
@@ -34,7 +38,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_day_view">DayViewActivity</string>
+    <string name="title_activity_task_view">Tasks</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

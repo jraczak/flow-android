@@ -13,17 +13,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class DayViewActivity extends AppCompatActivity
+public class TaskViewActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_day_view);
+        setContentView(R.layout.activity_task_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -45,8 +44,8 @@ public class DayViewActivity extends AppCompatActivity
         //TODO: Finish implementing this and add safety checks for null
         //TextView userEmailTextView = (TextView) findViewById(R.id.nav_user_email);
         //userEmailTextView.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        TextView userName = (TextView) findViewById(R.id.textview_user_name);
-        userName.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        //TextView userName = (TextView) findViewById(R.id.textview_user_name);
+        //userName.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -65,7 +64,7 @@ public class DayViewActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.day_view, menu);
+        getMenuInflater().inflate(R.menu.task_view, menu);
         return true;
     }
 

@@ -27,8 +27,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DayViewActivity"
-            android:label="@string/title_activity_day_view"
+            android:name=".TaskViewActivity"
+            android:label="@string/title_activity_task_view"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
