@@ -20,6 +20,10 @@
     <string name="today">Today</string>
     <!-- END TASK VIEW STRINGS -->
 
+    <!-- PROFILE STRINGS -->
+    <string name="nav_profile">Profile</string>
+    <!-- END PROFILE STRINGS -->
+
     <!-- CONTENT DESCRIPTION STRINGS -->
     <string name="cont_desc_next">next</string>
     <string name="cont_desc_finish">finish</string>
@@ -42,6 +46,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
     <!-- END CONTENT DESCRIPTION STRINGS -->
 
 </resources>

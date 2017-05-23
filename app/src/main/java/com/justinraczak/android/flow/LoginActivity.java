@@ -453,6 +453,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //if (success) {
             //    Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
             //    startActivity(dayViewIntent);
+            //TODO: Figure out how to get finish working without breaking the control flow
                 //finish();
             //} else {
             if (!success) {

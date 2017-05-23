@@ -8,6 +8,7 @@ public class User {
 
     public String id;
     public String email;
+    public String name;
 
     public User() {
         // Obligatory empty constructor
