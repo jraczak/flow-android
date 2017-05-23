@@ -77,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     // Firebase Auth
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,10 +140,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return;
         }
 
+        Log.d(TAG, "About to call createUserWithEmailAndPassword");
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "onComplete called");
                         if (task.isSuccessful()) {
                             // Creation successful, sign the user into the app
                             Log.d(TAG, "createUserWithEmail: successful");
@@ -427,10 +430,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                            //if (task.isSuccessful()) {
-                            //    Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
-                            //    startActivity(dayViewIntent);
-                            //}
+                            if (task.isSuccessful()) {
+                                Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
+                                startActivity(dayViewIntent);
+                            }
                             if (!task.isSuccessful()) {
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
                                 Toast.makeText(LoginActivity.this, "Unfortunately, sign in failed",
@@ -447,11 +450,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
-                startActivity(dayViewIntent);
-                finish();
-            } else {
+            //if (success) {
+            //    Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
+            //    startActivity(dayViewIntent);
+                //finish();
+            //} else {
+            if (!success) {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
