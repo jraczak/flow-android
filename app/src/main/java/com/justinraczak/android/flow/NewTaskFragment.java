@@ -2,13 +2,17 @@ package com.justinraczak.android.flow;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 
@@ -30,6 +34,7 @@ public class NewTaskFragment extends android.support.v4.app.DialogFragment {
     private String mParam1;
     private String mParam2;
 
+    private Button mSaveButton;
     private EditText mTaskNameEditText;
 
     private OnNewTaskFragmentInteractionListener mListener;
@@ -42,8 +47,8 @@ public class NewTaskFragment extends android.support.v4.app.DialogFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param
+     * @param
      * @return A new instance of fragment NewTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -77,15 +82,34 @@ public class NewTaskFragment extends android.support.v4.app.DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTaskNameEditText = (EditText) getView().findViewById(R.id.edit_text_new_task_task_name);
+        mSaveButton = (Button) view.findViewById(R.id.button_save_task);
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onSaveButtonPressed(mTaskNameEditText.getText().toString());
+            }
+        });
         mTaskNameEditText.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    //public void onButtonPressed(Uri uri) {
+    //    if (mListener != null) {
+    //        mListener.onSaveButtonPressed("whoCares");
+    //    }
+    //}
+
+    @Override
+    public void onResume() {
+        Window window = getDialog().getWindow();
+        Point size = new Point();
+        Display display = window.getWindowManager().getDefaultDisplay();
+        display.getSize(size);
+        window.setLayout((int) (size.x * 0.80), WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setGravity(Gravity.CENTER);
+
+        super.onResume();
     }
 
     @Override
@@ -117,6 +141,6 @@ public class NewTaskFragment extends android.support.v4.app.DialogFragment {
      */
     public interface OnNewTaskFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onSaveButtonPressed(String taskName);
     }
 }

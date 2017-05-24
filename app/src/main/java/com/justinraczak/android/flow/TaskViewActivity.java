@@ -1,7 +1,6 @@
 package com.justinraczak.android.flow;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -11,15 +10,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 public class TaskViewActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         NewTaskFragment.OnNewTaskFragmentInteractionListener {
+
+    private static final String LOG_TAG = TaskViewActivity.class.getSimpleName();
+
+    NewTaskFragment mNewTaskFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +127,18 @@ public class TaskViewActivity extends AppCompatActivity
     private void showNewTaskDialog() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         NewTaskFragment newTaskFragment = NewTaskFragment.newInstance();
+        mNewTaskFragment = newTaskFragment;
         newTaskFragment.show(fragmentManager, "fragment_new_task");
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-        return;
+    public void onSaveButtonPressed(String taskName) {
+        Log.d(LOG_TAG, "New task save button pressed");
+        Log.d(LOG_TAG, "Received new task with name " + taskName);
+        getSupportFragmentManager().beginTransaction().remove(mNewTaskFragment).commit();
+        mNewTaskFragment = null;
+        Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
         //TODO: Implement saving the task
+        //TODO: Implement refreshing the task list
     }
 }
