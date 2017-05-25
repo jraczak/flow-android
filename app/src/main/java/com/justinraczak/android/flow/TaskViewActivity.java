@@ -14,15 +14,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.justinraczak.android.flow.models.Task;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import io.realm.Realm;
 
 public class TaskViewActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         NewTaskFragment.OnNewTaskFragmentInteractionListener {
 
     private static final String LOG_TAG = TaskViewActivity.class.getSimpleName();
+
+    public Date mCurrentSelectedDate;
 
     NewTaskFragment mNewTaskFragment;
 
@@ -32,6 +41,9 @@ public class TaskViewActivity extends AppCompatActivity
         setContentView(R.layout.activity_task_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Not sure why this is needed here, but was getting errors just having it in the application
+        Realm.init(getApplicationContext());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -43,11 +55,21 @@ public class TaskViewActivity extends AppCompatActivity
             }
         });
 
+        //TODO: Figure out how to default the date to today, but don't erase selection if user if navigating from within the app
+        mCurrentSelectedDate = new Date();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        TextView todayTextView = (TextView) findViewById(R.id.textview_today_header);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("E, MMM d");
+        Date date = new Date();
+        todayTextView.setText(dateFormat.format(date));
+
+        //TODO: Create a recycler view to list open tasks
 
         //TODO: Finish implementing this and add safety checks for null
         //TextView userEmailTextView = (TextView) findViewById(R.id.nav_user_email);
@@ -139,6 +161,16 @@ public class TaskViewActivity extends AppCompatActivity
         mNewTaskFragment = null;
         Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
         //TODO: Implement saving the task
+        Task task = new Task(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                Task.getNewAutoIncrementId(),
+                taskName,
+                null,
+                mCurrentSelectedDate.toString());
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        Log.d(LOG_TAG, "Copying task " + task + " to Realm");
+        realm.copyToRealm(task);
+        realm.commitTransaction();
         //TODO: Implement refreshing the task list
     }
 }

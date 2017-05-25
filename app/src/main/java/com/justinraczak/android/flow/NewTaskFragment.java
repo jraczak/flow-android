@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.Display;
 import android.view.Gravity;
@@ -102,12 +103,18 @@ public class NewTaskFragment extends android.support.v4.app.DialogFragment {
 
     @Override
     public void onResume() {
-        Window window = getDialog().getWindow();
-        Point size = new Point();
-        Display display = window.getWindowManager().getDefaultDisplay();
-        display.getSize(size);
-        window.setLayout((int) (size.x * 0.80), WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setGravity(Gravity.CENTER);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                Window window = getDialog().getWindow();
+                Point size = new Point();
+                Display display = window.getWindowManager().getDefaultDisplay();
+                display.getSize(size);
+                window.setLayout((int) (size.x * 0.80), WindowManager.LayoutParams.WRAP_CONTENT);
+                window.setGravity(Gravity.CENTER);
+            }
+        });
+
 
         super.onResume();
     }

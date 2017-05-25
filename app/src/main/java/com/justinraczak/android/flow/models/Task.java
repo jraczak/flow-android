@@ -92,6 +92,7 @@ public class Task extends RealmObject {
     }
 
     public static Integer getNewAutoIncrementId() {
+
         Realm realm = Realm.getDefaultInstance();
         //Integer oldMaxId = realm.where(Set.class).max("realmId").intValue();
 
