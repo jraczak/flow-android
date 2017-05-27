@@ -14,16 +14,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.justinraczak.android.flow.adapters.TaskAdapter;
 import com.justinraczak.android.flow.models.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class TaskViewActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -31,7 +34,13 @@ public class TaskViewActivity extends AppCompatActivity
 
     private static final String LOG_TAG = TaskViewActivity.class.getSimpleName();
 
+    private ListView mTaskListView;
+    private TaskAdapter mTaskAdapter;
+    private RealmResults<Task> mTaskRealmResults;
+    public Realm mRealm;
+
     public Date mCurrentSelectedDate;
+    public String mCurrentSelectedDateString;
 
     NewTaskFragment mNewTaskFragment;
 
@@ -56,7 +65,10 @@ public class TaskViewActivity extends AppCompatActivity
         });
 
         //TODO: Figure out how to default the date to today, but don't erase selection if user if navigating from within the app
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         mCurrentSelectedDate = new Date();
+        mCurrentSelectedDateString = dateFormat.format(mCurrentSelectedDate);
+        Log.d(LOG_TAG, "Setting current date string to " + mCurrentSelectedDateString);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -65,9 +77,9 @@ public class TaskViewActivity extends AppCompatActivity
         toggle.syncState();
 
         TextView todayTextView = (TextView) findViewById(R.id.textview_today_header);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("E, MMM d");
+        SimpleDateFormat textViewDateFormat = new SimpleDateFormat("E, MMM d");
         Date date = new Date();
-        todayTextView.setText(dateFormat.format(date));
+        todayTextView.setText(textViewDateFormat.format(date));
 
         //TODO: Create a recycler view to list open tasks
 
@@ -79,6 +91,15 @@ public class TaskViewActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Fetch the tasks for the current day and load them into the adapter for display in list view
+        mRealm = Realm.getDefaultInstance();
+        mTaskRealmResults = mRealm.where(Task.class)
+                .equalTo("currentScheduledDate", mCurrentSelectedDateString)
+                .findAll();
+        mTaskListView = (ListView) findViewById(R.id.task_view_tasks_listview);
+        mTaskAdapter = new TaskAdapter(this, mTaskRealmResults.size(), mTaskRealmResults);
+        mTaskListView.setAdapter(mTaskAdapter);
     }
 
     @Override
@@ -165,7 +186,7 @@ public class TaskViewActivity extends AppCompatActivity
                 Task.getNewAutoIncrementId(),
                 taskName,
                 null,
-                mCurrentSelectedDate.toString());
+                mCurrentSelectedDateString);
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         Log.d(LOG_TAG, "Copying task " + task + " to Realm");
