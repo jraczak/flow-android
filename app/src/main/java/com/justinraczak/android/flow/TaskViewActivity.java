@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.justinraczak.android.flow.adapters.TaskAdapter;
 import com.justinraczak.android.flow.models.Task;
+import com.justinraczak.android.flow.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -193,5 +194,16 @@ public class TaskViewActivity extends AppCompatActivity
         realm.copyToRealm(task);
         realm.commitTransaction();
         //TODO: Implement refreshing the task list
+        updateTaskList();
+    }
+
+    public void updateTaskList() {
+        Log.d(LOG_TAG, "Updating task list");
+        mTaskRealmResults = mRealm.where(Task.class)
+                .equalTo("currentScheduledDate", mCurrentSelectedDateString)
+                .findAll();
+        mTaskAdapter = new TaskAdapter(this, mTaskRealmResults.size(), mTaskRealmResults);
+        mTaskListView.setAdapter(mTaskAdapter);
+        Utils.setListViewHeightBasedOnItems(mTaskListView);
     }
 }

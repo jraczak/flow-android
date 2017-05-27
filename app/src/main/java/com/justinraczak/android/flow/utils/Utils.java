@@ -6,6 +6,10 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,4 +50,35 @@ public class Utils {
         User user = new User(id, email);
         databaseReference.child("users").child(id).setValue(user);
     }
+
+    public static boolean setListViewHeightBasedOnItems(ListView listView) {
+
+        ListAdapter listAdapter = listView.getAdapter();
+
+        if (listAdapter != null) {
+            int numberOfItems = listAdapter.getCount();
+            int totalItemsHeight = 0;
+
+            for (int itemPosition = 0; itemPosition < numberOfItems; itemPosition++) {
+                View item = listAdapter.getView(itemPosition, null, listView);
+                item.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                totalItemsHeight += item.getMeasuredHeight();
+            }
+
+            int totalDividersHeight = listView.getDividerHeight() * (numberOfItems -1 );
+
+            ViewGroup.LayoutParams params =
+                    listView.getLayoutParams();
+            params.height = totalItemsHeight + totalDividersHeight;
+            listView.setLayoutParams(params);
+            listView.requestLayout();
+            listView.setFocusable(false);
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
