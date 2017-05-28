@@ -28,6 +28,8 @@
     <string name="cont_desc_next">next</string>
     <string name="cont_desc_finish">finish</string>
     <string name="cont_desc_skip">skip</string>
+    <string name="cont_desc_previous_date">Navigate to previous date</string>
+    <string name="cont_desc_next_date">Navigate to next date</string>
     <string name="title_activity_login">Sign Up</string>
 
     <!-- Strings related to login -->
