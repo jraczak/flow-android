@@ -8,10 +8,11 @@
     tools:context="com.justinraczak.android.flow.TaskViewActivity"
     tools:showIn="@layout/app_bar_task_view">
 
-    <ImageView
+    <ImageButton
         android:id="@+id/task_view_left_chevron"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:contentDescription="@string/cont_desc_previous_date"
         android:src="@drawable/ic_chevron_left"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,10 +36,11 @@
 
         tools:layout_editor_absoluteX="149dp" />
 
-    <ImageView
+    <ImageButton
         android:id="@id/task_view_right_chevron"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:contentDescription="@string/cont_desc_next_date"
         android:src="@drawable/ic_chevron_right"
         app:layout_constraintTop_toTopOf="@id/textview_today_header"

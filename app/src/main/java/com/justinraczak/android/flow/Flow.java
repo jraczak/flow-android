@@ -3,6 +3,8 @@ package com.justinraczak.android.flow;
 import android.app.Application;
 import android.util.Log;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -27,5 +29,8 @@ public class Flow extends Application {
         Realm.setDefaultConfiguration(defaultConfig);
         mRealm = Realm.getDefaultInstance();
         Log.d("Flow Application", "Realm configured and is " + mRealm);
+
+        Log.d("Flow Application", "Initializing Joda Time");
+        JodaTimeAndroid.init(this);
     }
 }

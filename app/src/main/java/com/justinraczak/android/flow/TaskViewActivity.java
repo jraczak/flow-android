@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.justinraczak.android.flow.adapters.TaskAdapter;
 import com.justinraczak.android.flow.models.Task;
 import com.justinraczak.android.flow.utils.Utils;
+
+import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,13 +38,20 @@ public class TaskViewActivity extends AppCompatActivity
 
     private static final String LOG_TAG = TaskViewActivity.class.getSimpleName();
 
+    // For querying and displaying the day's tasks
     private ListView mTaskListView;
     private TaskAdapter mTaskAdapter;
     private RealmResults<Task> mTaskRealmResults;
     public Realm mRealm;
 
-    public Date mCurrentSelectedDate;
+    // For navigating the dates
+    public TextView mDateHeader;
+    public DateTime mCurrentSelectedDate;
     public String mCurrentSelectedDateString;
+    public SimpleDateFormat mDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    public ImageButton mPreviousDateButton;
+    public ImageButton mNextDateButton;
+    public SimpleDateFormat mHeaderDateFormat = new SimpleDateFormat("E, MMM d");
 
     NewTaskFragment mNewTaskFragment;
 
@@ -66,9 +76,8 @@ public class TaskViewActivity extends AppCompatActivity
         });
 
         //TODO: Figure out how to default the date to today, but don't erase selection if user if navigating from within the app
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        mCurrentSelectedDate = new Date();
-        mCurrentSelectedDateString = dateFormat.format(mCurrentSelectedDate);
+        mCurrentSelectedDate = new DateTime();
+        mCurrentSelectedDateString = mDateFormat.format(mCurrentSelectedDate.toDate());
         Log.d(LOG_TAG, "Setting current date string to " + mCurrentSelectedDateString);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -77,12 +86,24 @@ public class TaskViewActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        TextView todayTextView = (TextView) findViewById(R.id.textview_today_header);
-        SimpleDateFormat textViewDateFormat = new SimpleDateFormat("E, MMM d");
+        mDateHeader = (TextView) findViewById(R.id.textview_today_header);
         Date date = new Date();
-        todayTextView.setText(textViewDateFormat.format(date));
+        mDateHeader.setText(mHeaderDateFormat.format(date));
 
-        //TODO: Create a recycler view to list open tasks
+        mPreviousDateButton = (ImageButton) findViewById(R.id.task_view_left_chevron);
+        mNextDateButton = (ImageButton) findViewById(R.id.task_view_right_chevron);
+        mPreviousDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToPreviousDay();
+            }
+        });
+        mNextDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToNextDay();
+            }
+        });
 
         //TODO: Finish implementing this and add safety checks for null
         //TextView userEmailTextView = (TextView) findViewById(R.id.nav_user_email);
@@ -182,7 +203,6 @@ public class TaskViewActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().remove(mNewTaskFragment).commit();
         mNewTaskFragment = null;
         Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
-        //TODO: Implement saving the task
         Task task = new Task(FirebaseAuth.getInstance().getCurrentUser().getUid(),
                 Task.getNewAutoIncrementId(),
                 taskName,
@@ -193,7 +213,24 @@ public class TaskViewActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Copying task " + task + " to Realm");
         realm.copyToRealm(task);
         realm.commitTransaction();
-        //TODO: Implement refreshing the task list
+        updateTaskList();
+    }
+
+    public void navigateToPreviousDay() {
+        Log.d(LOG_TAG, "Attempting to navigate from " + mCurrentSelectedDateString);
+        mCurrentSelectedDate = Utils.decrementDate(mCurrentSelectedDateString);
+        mCurrentSelectedDateString = mDateFormat.format(mCurrentSelectedDate.toDate());
+        Log.d(LOG_TAG, "Updated date view to " + mCurrentSelectedDateString);
+        mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
+        updateTaskList();
+    }
+
+    public void navigateToNextDay() {
+        Log.d(LOG_TAG, "Attempting to navigate from " + mCurrentSelectedDateString);
+        mCurrentSelectedDate = Utils.incrementDate(mCurrentSelectedDateString);
+        mCurrentSelectedDateString = mDateFormat.format(mCurrentSelectedDate.toDate());
+        Log.d(LOG_TAG, "Updated date view to " + mCurrentSelectedDateString);
+        mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
         updateTaskList();
     }
 

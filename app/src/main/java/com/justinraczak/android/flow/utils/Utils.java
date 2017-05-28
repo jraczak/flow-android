@@ -15,6 +15,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.justinraczak.android.flow.models.User;
 
+import org.joda.time.DateTime;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Justin on 5/15/17.
  */
@@ -24,6 +30,8 @@ public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
 
     private static final String PREFERENCES_FILE = "flow_settings";
+
+    private static final SimpleDateFormat mDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public static Drawable tintMyDrawable(Drawable drawable, int color) {
         drawable = DrawableCompat.wrap(drawable);
@@ -79,6 +87,30 @@ public class Utils {
         else {
             return false;
         }
+    }
+
+    public static Date getDateFromString(String dateString) {
+        try {
+            Log.d(TAG, "Parsing date string " + dateString);
+            return mDateFormat.parse(dateString);
+        } catch (ParseException e) {
+            Log.d(TAG, "Error parsing date string");
+            return null;
+        }
+    }
+
+    public static DateTime incrementDate(String dateString) {
+        Date date = getDateFromString(dateString);
+        DateTime dateTime = new DateTime(date);
+        dateTime = dateTime.plusDays(1);
+        return dateTime;
+    }
+
+    public static DateTime decrementDate(String dateString) {
+        Date date = getDateFromString(dateString);
+        DateTime dateTime = new DateTime(date);
+        dateTime = dateTime.minusDays(1);
+        return dateTime;
     }
 
 }
