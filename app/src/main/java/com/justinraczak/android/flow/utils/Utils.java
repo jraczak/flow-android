@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.justinraczak.android.flow.models.Task;
 import com.justinraczak.android.flow.models.User;
 
 import org.joda.time.DateTime;
@@ -57,6 +58,14 @@ public class Utils {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         User user = new User(id, email);
         databaseReference.child("users").child(id).setValue(user);
+    }
+
+    public static void writeNewTaskToFirebase(Task task) {
+        Log.d(TAG, "Attempting to save new task to Firebase");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("users").child(task.getUserId()).child("tasks")
+                .child(String.valueOf(task.getLocalRealmId()))
+                .setValue(task);
     }
 
     public static boolean setListViewHeightBasedOnItems(ListView listView) {

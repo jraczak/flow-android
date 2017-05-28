@@ -213,6 +213,7 @@ public class TaskViewActivity extends AppCompatActivity
         Log.d(LOG_TAG, "Copying task " + task + " to Realm");
         realm.copyToRealm(task);
         realm.commitTransaction();
+        Utils.writeNewTaskToFirebase(task);
         updateTaskList();
     }
 

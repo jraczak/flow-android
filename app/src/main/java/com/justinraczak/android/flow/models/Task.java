@@ -6,6 +6,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by Justin on 5/21/17.
@@ -17,7 +18,8 @@ public class Task extends RealmObject {
     private static final String LOG_TAG = Task.class.getSimpleName();
 
     public String userId;
-    public int realmId;
+    @PrimaryKey
+    public int localRealmId;
     public String name;
     public String note;
     public String originalScheduledDate;
@@ -29,9 +31,9 @@ public class Task extends RealmObject {
         // The default constructor
     }
 
-    public Task(String userId, int realmId, String name, String note, String originalScheduledDate) {
+    public Task(String userId, int localRealmId, String name, String note, String originalScheduledDate) {
         this.userId = userId;
-        this.realmId = realmId;
+        this.localRealmId = localRealmId;
         this.name = name;
         this.note = note;
         this.originalScheduledDate = originalScheduledDate;
@@ -87,6 +89,14 @@ public class Task extends RealmObject {
         this.migrationCount = migrationCount;
     }
 
+    public int getLocalRealmId() {
+        return localRealmId;
+    }
+
+    public void setLocalRealmId(int localRealmId) {
+        this.localRealmId = localRealmId;
+    }
+
     public void incrementMigrations() {
         this.migrationCount += 1;
     }
@@ -94,16 +104,16 @@ public class Task extends RealmObject {
     public static Integer getNewAutoIncrementId() {
 
         Realm realm = Realm.getDefaultInstance();
-        //Integer oldMaxId = realm.where(Set.class).max("realmId").intValue();
+        //Integer oldMaxId = realm.where(Set.class).max("localRealmId").intValue();
 
-        if (realm.where(Task.class).max("realmId") == null) {
+        if (realm.where(Task.class).max("localRealmId") == null) {
             Log.d(LOG_TAG,"max task table id was null, returning 1");
             realm.close();
             return 1;
         } else {
             Log.d(LOG_TAG, "incrementing max task table id");
             realm.close();
-            return (realm.where(Task.class).max("realmId").intValue()+1);
+            return (realm.where(Task.class).max("localRealmId").intValue()+1);
         }
     }
 }

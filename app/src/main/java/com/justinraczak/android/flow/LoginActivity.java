@@ -160,6 +160,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         } else {
                            // Creation failed, handle the error
                             Log.w(TAG, "createUserWithEmail: failed");
+                            //TODO: Figure out how to not throw this when user is signed in to existing account, not failed
                             Toast.makeText(getApplicationContext(), "Account creation failed", Toast.LENGTH_LONG)
                                     .show();
                         }

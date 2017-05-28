@@ -24,6 +24,7 @@ public class Flow extends Application {
         RealmConfiguration defaultConfig = new RealmConfiguration.Builder()
                 .name("flow-android.realm")
                 .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
                 .build();
 
         Realm.setDefaultConfiguration(defaultConfig);
