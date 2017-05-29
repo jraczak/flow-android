@@ -1,4 +1,4 @@
-package com.justinraczak.android.flow.rx;
+package rx;
 
 /**
  * Created by Justin on 5/28/17.

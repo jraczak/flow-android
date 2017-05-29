@@ -87,8 +87,7 @@ public class TaskViewActivity extends AppCompatActivity
         toggle.syncState();
 
         mDateHeader = (TextView) findViewById(R.id.textview_today_header);
-        Date date = new Date();
-        mDateHeader.setText(mHeaderDateFormat.format(date));
+        updateDateHeader();
 
         mPreviousDateButton = (ImageButton) findViewById(R.id.task_view_left_chevron);
         mNextDateButton = (ImageButton) findViewById(R.id.task_view_right_chevron);
@@ -217,12 +216,24 @@ public class TaskViewActivity extends AppCompatActivity
         updateTaskList();
     }
 
+    public void updateDateHeader() {
+        Log.d(LOG_TAG, "Selected date is " +
+        mCurrentSelectedDateString +
+        " and current date is " +
+        mDateFormat.format(new Date()));
+        if (mCurrentSelectedDateString.equals(mDateFormat.format(new Date()))) {
+            mDateHeader.setText(getResources().getString(R.string.today));
+        } else {
+            mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
+        }
+    }
+
     public void navigateToPreviousDay() {
         Log.d(LOG_TAG, "Attempting to navigate from " + mCurrentSelectedDateString);
         mCurrentSelectedDate = Utils.decrementDate(mCurrentSelectedDateString);
         mCurrentSelectedDateString = mDateFormat.format(mCurrentSelectedDate.toDate());
         Log.d(LOG_TAG, "Updated date view to " + mCurrentSelectedDateString);
-        mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
+        updateDateHeader();
         updateTaskList();
     }
 
@@ -231,7 +242,7 @@ public class TaskViewActivity extends AppCompatActivity
         mCurrentSelectedDate = Utils.incrementDate(mCurrentSelectedDateString);
         mCurrentSelectedDateString = mDateFormat.format(mCurrentSelectedDate.toDate());
         Log.d(LOG_TAG, "Updated date view to " + mCurrentSelectedDateString);
-        mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
+        updateDateHeader();
         updateTaskList();
     }
 
