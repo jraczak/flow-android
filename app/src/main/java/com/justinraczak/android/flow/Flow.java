@@ -7,8 +7,6 @@ import com.justinraczak.android.flow.data.Migration;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import java.io.FileNotFoundException;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -24,6 +22,7 @@ public class Flow extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Log.d("Application", "Calling Realm.init");
         Realm.init(this);
         RealmConfiguration defaultConfig = new RealmConfiguration.Builder()
                 .name("flow-android.realm")
@@ -31,11 +30,11 @@ public class Flow extends Application {
                 .migration(new Migration())
                 .build();
 
-        try {
-            Realm.migrateRealm(defaultConfig, new Migration());
-        } catch (FileNotFoundException exception) {
-            Log.d("Application", "Realm file not found for migration");
-        }
+        //try {
+        //    Realm.migrateRealm(defaultConfig, new Migration());
+        //} catch (FileNotFoundException exception) {
+        //    Log.d("Application", "Realm file not found for migration");
+        //}
 
         Realm.setDefaultConfiguration(defaultConfig);
         mRealm = Realm.getDefaultInstance();

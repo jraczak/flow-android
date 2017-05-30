@@ -2,11 +2,11 @@ package com.justinraczak.android.flow.models;
 
 import android.util.Log;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
 /**
@@ -19,7 +19,7 @@ public class Task extends RealmObject {
     private static final String LOG_TAG = Task.class.getSimpleName();
 
     public String userId;
-    @PrimaryKey
+    //@PrimaryKey
     public int localRealmId;
     public String name;
     public String note;
@@ -113,14 +113,23 @@ public class Task extends RealmObject {
         this.migrationCount += 1;
     }
 
-    public Boolean toggleCompleteState() {
+    public void toggleCompleteState() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
         if (!this.complete) {
             this.setComplete(true);
-            return true;
         } else {
             this.setComplete(false);
-            return false;
         }
+        realm.commitTransaction();
+        //TODO: Update the state in Firebase
+        FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(this.userId)
+                .child("tasks")
+                .child(String.valueOf(this.localRealmId))
+                .child("complete")
+                .setValue(this.complete);
     }
 
     public static Integer getNewAutoIncrementId() {

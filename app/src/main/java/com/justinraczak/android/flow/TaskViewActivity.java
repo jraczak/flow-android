@@ -68,7 +68,7 @@ public class TaskViewActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Not sure why this is needed here, but was getting errors just having it in the application
-        Realm.init(getApplicationContext());
+        //Realm.init(getApplicationContext());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -226,6 +226,7 @@ public class TaskViewActivity extends AppCompatActivity
                 taskName,
                 null,
                 mCurrentSelectedDateString);
+        Log.d(LOG_TAG, "Complete state of new task is " + task.complete);
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         Log.d(LOG_TAG, "Copying task " + task + " to Realm");

@@ -5,9 +5,8 @@
         android:width="1dp"
         android:color="@android:color/black"/>
     <solid
-        android:color="@android:color/darker_gray"/>
+        android:color="@android:color/white"/>
     <size
         android:width="12pt"
         android:height="12pt"/>
-
 </shape>

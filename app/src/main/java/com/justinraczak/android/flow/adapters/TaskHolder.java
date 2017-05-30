@@ -3,6 +3,7 @@ package com.justinraczak.android.flow.adapters;
 import android.content.Context;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import com.justinraczak.android.flow.models.Task;
  */
 
 public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    private final static String LOG_TAG = TaskHolder.class.getSimpleName();
 
     private final TextView taskNameTextView;
     private final CheckBox checkBox;
@@ -33,12 +36,15 @@ public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickL
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(LOG_TAG, "Task " + task.name + " complete state is currently " + task.complete + "; toggling");
                 task.toggleCompleteState();
-                if (task.complete) {
-                    taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                } else {
-                    taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                }
+                Log.d(LOG_TAG, "Task complete state is + " + task.complete + " after toggle");
+                setUiCompleteState();
+                //if (task.complete) {
+                //    taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                //} else {
+                //    taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                //}
             }
         });
 
@@ -54,6 +60,16 @@ public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickL
     public void onClick(View v) {
         if (this.task != null) {
             Toast.makeText(this.context, "Tapped " + task.name + "task", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setUiCompleteState() {
+        if (task.complete) {
+            checkBox.setChecked(true);
+            taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            checkBox.setChecked(false);
+            taskNameTextView.setPaintFlags(taskNameTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
     }
 }
