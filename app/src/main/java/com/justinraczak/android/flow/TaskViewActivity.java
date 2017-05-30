@@ -9,19 +9,23 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.justinraczak.android.flow.adapters.TaskAdapter;
 import com.justinraczak.android.flow.models.Task;
+import com.justinraczak.android.flow.recycler.ShadowVerticalSpaceItemDecorator;
+import com.justinraczak.android.flow.recycler.VerticalSpaceItemDecorator;
 import com.justinraczak.android.flow.utils.Utils;
 
 import org.joda.time.DateTime;
@@ -39,7 +43,8 @@ public class TaskViewActivity extends AppCompatActivity
     private static final String LOG_TAG = TaskViewActivity.class.getSimpleName();
 
     // For querying and displaying the day's tasks
-    private ListView mTaskListView;
+    //private ListView mTaskListView;
+    private RecyclerView mTaskRecyclerView;
     private TaskAdapter mTaskAdapter;
     private RealmResults<Task> mTaskRealmResults;
     public Realm mRealm;
@@ -118,9 +123,23 @@ public class TaskViewActivity extends AppCompatActivity
         mTaskRealmResults = mRealm.where(Task.class)
                 .equalTo("currentScheduledDate", mCurrentSelectedDateString)
                 .findAll();
-        mTaskListView = (ListView) findViewById(R.id.task_view_tasks_listview);
+
+        // Set up utilities to manage recycler view
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        int verticalSpacing = 8;
+        VerticalSpaceItemDecorator itemDecorator = new VerticalSpaceItemDecorator(verticalSpacing);
+        ShadowVerticalSpaceItemDecorator shadowVerticalSpaceItemDecorator =
+                new ShadowVerticalSpaceItemDecorator(this, R.drawable.task_recycler_view_drop_shadow);
+        RecyclerView.ItemDecoration dividerDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+
+        mTaskRecyclerView = (RecyclerView) findViewById(R.id.task_view_tasks_listview);
+        mTaskRecyclerView.setLayoutManager(layoutManager);
+        mTaskRecyclerView.addItemDecoration(dividerDecoration);
+        //mTaskRecyclerView.addItemDecoration(shadowVerticalSpaceItemDecorator);
+        //mTaskRecyclerView.addItemDecoration(itemDecorator);
+
         mTaskAdapter = new TaskAdapter(this, mTaskRealmResults.size(), mTaskRealmResults);
-        mTaskListView.setAdapter(mTaskAdapter);
+        mTaskRecyclerView.setAdapter(mTaskAdapter);
     }
 
     @Override
@@ -252,7 +271,8 @@ public class TaskViewActivity extends AppCompatActivity
                 .equalTo("currentScheduledDate", mCurrentSelectedDateString)
                 .findAll();
         mTaskAdapter = new TaskAdapter(this, mTaskRealmResults.size(), mTaskRealmResults);
-        mTaskListView.setAdapter(mTaskAdapter);
-        Utils.setListViewHeightBasedOnItems(mTaskListView);
+        mTaskRecyclerView.setAdapter(mTaskAdapter);
+        //TODO: Figure out if this utility is still needed with RecyclerView
+        //Utils.setListViewHeightBasedOnItems(mTaskListView);
     }
 }

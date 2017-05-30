@@ -7,6 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 /**
  * Created by Justin on 5/21/17.
@@ -26,6 +27,8 @@ public class Task extends RealmObject {
     public String currentScheduledDate;
     // Note this won't be passed into the constructor
     public int migrationCount;
+    @Required
+    public Boolean complete;
 
     public Task() {
         // The default constructor
@@ -39,6 +42,7 @@ public class Task extends RealmObject {
         this.originalScheduledDate = originalScheduledDate;
         this.currentScheduledDate = originalScheduledDate;
         this.migrationCount = 0;
+        this.complete = false;
     }
 
     public String getUserId() {
@@ -97,8 +101,26 @@ public class Task extends RealmObject {
         this.localRealmId = localRealmId;
     }
 
+    public Boolean getComplete() {
+        return complete;
+    }
+
+    public void setComplete(Boolean complete) {
+        this.complete = complete;
+    }
+
     public void incrementMigrations() {
         this.migrationCount += 1;
+    }
+
+    public Boolean toggleCompleteState() {
+        if (!this.complete) {
+            this.setComplete(true);
+            return true;
+        } else {
+            this.setComplete(false);
+            return false;
+        }
     }
 
     public static Integer getNewAutoIncrementId() {
