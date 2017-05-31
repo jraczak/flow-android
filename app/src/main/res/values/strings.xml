@@ -16,8 +16,14 @@
     <string name="lets_go">LET\'S GO</string>
     <!-- END WELCOME STRINGS -->
 
+    <!-- NAVIGATION DRAWER STRINGS -->
+    <string name="nav_account">Account</string>
+    <string name="nav_sign_out">Sign Out</string>
+    <!-- END NAVIGATION DRAWER STRINGS -->
+
     <!-- TASK VIEW STRINGS -->
     <string name="today">Today</string>
+    <string name="nav_tasks">Tasks</string>
     <!-- END TASK VIEW STRINGS -->
 
     <!-- NEW TASK FRAGMENT STRINGS -->
@@ -27,6 +33,7 @@
 
     <!-- PROFILE STRINGS -->
     <string name="nav_profile">Profile</string>
+    <string name="profile_email_label">You signed up for Flow using:</string>
     <!-- END PROFILE STRINGS -->
 
     <!-- CONTENT DESCRIPTION STRINGS -->
@@ -53,7 +60,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="title_activity_user_profile">UserProfileActivity</string>
+    <string name="title_activity_user_profile">My Profile</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

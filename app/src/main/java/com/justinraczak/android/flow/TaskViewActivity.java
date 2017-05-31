@@ -187,8 +187,8 @@ public class TaskViewActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.nav_tasks) {
+            // Do nothing, we're already here.
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_profile) {

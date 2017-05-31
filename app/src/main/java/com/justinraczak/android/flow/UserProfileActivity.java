@@ -1,9 +1,7 @@
 package com.justinraczak.android.flow;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,15 +31,6 @@ public class UserProfileActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -49,12 +38,18 @@ public class UserProfileActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
+        TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
+        if (mCurrentUser != null) {
+            navNameTextView.setText("");
+            navEmailTextView.setText(mCurrentUser.getEmail());
+            navigationView.setNavigationItemSelectedListener(this);
 
-        TextView signupDateTextView = (TextView) findViewById(R.id.profile_signup_date);
-        TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
-        signupDateTextView.setText(mCurrentUser.getUid());
-        emailTextView.setText(mCurrentUser.getEmail());
+            //TextView signupDateTextView = (TextView) findViewById(R.id.profile_signup_date);
+            TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
+            //signupDateTextView.setText(mCurrentUser.getUid());
+            emailTextView.setText(mCurrentUser.getEmail());
+        }
     }
 
     @Override
@@ -95,9 +90,13 @@ public class UserProfileActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
+        if (id == R.id.nav_tasks) {
+           Intent intent = new Intent(this, TaskViewActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_profile) {
+            // Do nothing, we're already here
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -107,6 +106,10 @@ public class UserProfileActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
 
+        } else if (id == R.id.nav_sign_out) {
+            FirebaseAuth.getInstance().signOut();
+            Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(loginIntent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
