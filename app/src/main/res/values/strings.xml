@@ -33,7 +33,7 @@
 
     <!-- PROFILE STRINGS -->
     <string name="nav_profile">Profile</string>
-    <string name="profile_email_label">You signed up for Flow using:</string>
+    <string name="profile_header">Hello, %1$s! You have %2$d new messages.</string>
     <!-- END PROFILE STRINGS -->
 
     <!-- CONTENT DESCRIPTION STRINGS -->

@@ -42,7 +42,9 @@ public class UserProfileActivity extends AppCompatActivity
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
         if (mCurrentUser != null) {
             navNameTextView.setText("");
-            navEmailTextView.setText(mCurrentUser.getEmail());
+            String headerFormat = getString(R.string.profile_header);
+            String headerString = String.format(headerFormat, mCurrentUser.getEmail(), 3);
+            navEmailTextView.setText(headerString);
             navigationView.setNavigationItemSelectedListener(this);
 
             //TextView signupDateTextView = (TextView) findViewById(R.id.profile_signup_date);
