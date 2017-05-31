@@ -17,6 +17,7 @@ import io.realm.RealmConfiguration;
 public class Flow extends Application {
 
     private Realm mRealm;
+    //private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate() {
@@ -26,7 +27,7 @@ public class Flow extends Application {
         Realm.init(this);
         RealmConfiguration defaultConfig = new RealmConfiguration.Builder()
                 .name("flow-android.realm")
-                .schemaVersion(2)
+                .schemaVersion(3)
                 .migration(new Migration())
                 .build();
 
@@ -42,5 +43,12 @@ public class Flow extends Application {
 
         Log.d("Flow Application", "Initializing Joda Time");
         JodaTimeAndroid.init(this);
+
+        //mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
+
+    //TODO: Figure out how to make this global
+    //public FirebaseAnalytics getmFirebaseAnalytics() {
+    //    return mFirebaseAnalytics;
+    //}
 }

@@ -18,12 +18,16 @@ public class Task extends RealmObject {
 
     private static final String LOG_TAG = Task.class.getSimpleName();
 
+    @Required
     public String userId;
     //@PrimaryKey
     public int localRealmId;
+    @Required
     public String name;
     public String note;
+    @Required
     public String originalScheduledDate;
+    @Required
     public String currentScheduledDate;
     // Note this won't be passed into the constructor
     public int migrationCount;

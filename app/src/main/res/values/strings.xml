@@ -20,6 +20,11 @@
     <string name="today">Today</string>
     <!-- END TASK VIEW STRINGS -->
 
+    <!-- NEW TASK FRAGMENT STRINGS -->
+    <string name="new_task_fragment_title">What do you need to get done?</string>
+    <string name="save">save</string>
+    <!-- END NEW TASK FRAGMENT STRINGS -->
+
     <!-- PROFILE STRINGS -->
     <string name="nav_profile">Profile</string>
     <!-- END PROFILE STRINGS -->
@@ -52,6 +57,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appwidget_text">tasks left</string>
+    <string name="appwidget_no_tasks_text">boom! all done</string>
+    <string name="add_widget">Add widget</string>
     <!-- END CONTENT DESCRIPTION STRINGS -->
 
 </resources>

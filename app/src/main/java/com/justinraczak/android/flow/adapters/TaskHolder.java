@@ -54,6 +54,7 @@ public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickL
     public void bindTask(Task task) {
         this.task = task;
         this.taskNameTextView.setText(task.name);
+        setUiCompleteState();
     }
 
     @Override

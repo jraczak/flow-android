@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="What do you need to get done?" />
+        android:text="@string/new_task_fragment_title" />
     <EditText
         android:id="@+id/edit_text_new_task_task_name"
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="save"
+        android:text="@string/save"
         style="@style/Widget.AppCompat.Button.Colored"/>
 
 

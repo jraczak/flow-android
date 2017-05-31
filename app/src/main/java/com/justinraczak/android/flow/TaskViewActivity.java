@@ -13,14 +13,17 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.justinraczak.android.flow.adapters.TaskAdapter;
 import com.justinraczak.android.flow.models.Task;
@@ -49,6 +52,8 @@ public class TaskViewActivity extends AppCompatActivity
     private RealmResults<Task> mTaskRealmResults;
     public Realm mRealm;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     // For navigating the dates
     public TextView mDateHeader;
     public DateTime mCurrentSelectedDate;
@@ -69,6 +74,8 @@ public class TaskViewActivity extends AppCompatActivity
 
         // Not sure why this is needed here, but was getting errors just having it in the application
         //Realm.init(getApplicationContext());
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -218,22 +225,46 @@ public class TaskViewActivity extends AppCompatActivity
     public void onSaveButtonPressed(String taskName) {
         Log.d(LOG_TAG, "New task save button pressed");
         Log.d(LOG_TAG, "Received new task with name " + taskName);
-        getSupportFragmentManager().beginTransaction().remove(mNewTaskFragment).commit();
-        mNewTaskFragment = null;
-        Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
-        Task task = new Task(FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                Task.getNewAutoIncrementId(),
-                taskName,
-                null,
-                mCurrentSelectedDateString);
-        Log.d(LOG_TAG, "Complete state of new task is " + task.complete);
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        Log.d(LOG_TAG, "Copying task " + task + " to Realm");
-        realm.copyToRealm(task);
-        realm.commitTransaction();
-        Utils.writeNewTaskToFirebase(task);
-        updateTaskList();
+        if (!textFieldEmpty(mNewTaskFragment)) {
+            getSupportFragmentManager().beginTransaction().remove(mNewTaskFragment).commit();
+            mNewTaskFragment = null;
+            Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
+            Task task = new Task(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                    Task.getNewAutoIncrementId(),
+                    taskName,
+                    null,
+                    mCurrentSelectedDateString);
+            Log.d(LOG_TAG, "Complete state of new task is " + task.complete);
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            Log.d(LOG_TAG, "Copying task " + task + " to Realm");
+            realm.copyToRealm(task);
+            realm.commitTransaction();
+            Utils.writeNewTaskToFirebase(task);
+            // Log the event in Firebase
+            Bundle taskBundle = new Bundle();
+            taskBundle.putString("taskName", task.getName());
+            mFirebaseAnalytics.logEvent("createTask", taskBundle);
+            updateTaskList();
+        }
+    }
+
+    public boolean textFieldEmpty(NewTaskFragment newTaskFragment) {
+        Boolean empty;
+
+        String taskName = ((EditText)newTaskFragment.getView()
+                .findViewById(R.id.edit_text_new_task_task_name))
+                .getText().toString();
+        if (TextUtils.isEmpty(taskName)) {
+            ((EditText) newTaskFragment.getView()
+                    .findViewById(R.id.edit_text_new_task_task_name))
+                    .setError("Give it a name!");
+            Log.d(LOG_TAG, "User tried to create task with no name");
+            empty = true;
+        } else {
+            empty = false;
+        }
+        return empty;
     }
 
     public void updateDateHeader() {
