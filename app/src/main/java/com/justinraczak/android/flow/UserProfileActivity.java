@@ -2,6 +2,7 @@ package com.justinraczak.android.flow;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -50,12 +51,14 @@ public class UserProfileActivity extends AppCompatActivity
         Cursor cursor = getContentResolver().query(
                 UserContract.UserEntry.CONTENT_URI,
                 null,
-                null,
+                UserContract.UserEntry.COLUMN_USER_ID + "=?",
                 userId,
                 null,
                 null
         );
-        String email = cursor.getString(cursor.getColumnIndex(UserContract.UserEntry.COLUMN_USER_EMAIL));
+        DatabaseUtils.dumpCursor(cursor);
+        cursor.moveToFirst();
+        String email = cursor.getString(2);
         Log.d(LOG_TAG, "Used cursor to find user with email " + email);
         cursor.close();
 

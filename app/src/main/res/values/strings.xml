@@ -24,6 +24,7 @@
     <!-- TASK VIEW STRINGS -->
     <string name="today">Today</string>
     <string name="nav_tasks">Tasks</string>
+    <string name="cont_desc_add_new_task">Add a new task</string>
     <!-- END TASK VIEW STRINGS -->
 
     <!-- NEW TASK FRAGMENT STRINGS -->

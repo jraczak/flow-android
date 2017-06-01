@@ -274,8 +274,10 @@ public class TaskViewActivity extends AppCompatActivity
         mDateFormat.format(new Date()));
         if (mCurrentSelectedDateString.equals(mDateFormat.format(new Date()))) {
             mDateHeader.setText(getResources().getString(R.string.today));
+            mDateHeader.setContentDescription(getResources().getString(R.string.today));
         } else {
             mDateHeader.setText(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
+            mDateHeader.setContentDescription(mHeaderDateFormat.format(mCurrentSelectedDate.toDate()));
         }
     }
 

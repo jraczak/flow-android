@@ -10,12 +10,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by Justin on 5/31/17.
  */
 
 public class UserProvider extends ContentProvider {
+
+    private static final String LOG_TAG = UserProvider.class.getSimpleName();
 
     private UsersDbHelper mUsersDbHelper;
 
@@ -58,9 +61,10 @@ public class UserProvider extends ContentProvider {
                         sortOrder);
                 break;
             case USER_WITH_ID:
+                Log.d(LOG_TAG, "Matched uri for user with id, attempting query");
                 //Get the id value, index 0 would be the root /users segment
                 String id = uri.getPathSegments().get(1);
-                // Questin mark to indicate to get the value from the mSelectionArgs variable
+                // Question mark to indicate to get the value from the mSelectionArgs variable
                 String mSelection = "id=?";
                 String[] mSelectionArgs = new String[]{id};
                 returnedCursor = db.query(UserContract.UserEntry.TABLE_NAME,
