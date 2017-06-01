@@ -108,6 +108,11 @@ public class Utils {
         }
     }
 
+    public static String getStorageDateString(Date date) {
+        SimpleDateFormat mDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        return mDateFormat.format(date);
+    }
+
     public static DateTime incrementDate(String dateString) {
         Date date = getDateFromString(dateString);
         DateTime dateTime = new DateTime(date);

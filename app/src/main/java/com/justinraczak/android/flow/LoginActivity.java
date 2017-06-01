@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -35,9 +36,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.justinraczak.android.flow.data.UserContract;
 import com.justinraczak.android.flow.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -150,8 +153,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             // Creation successful, sign the user into the app
                             Log.d(TAG, "createUserWithEmail: successful");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            // Store the new user to the local database
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put("email", user.getEmail());
+                            contentValues.put("signupDate", Utils.getStorageDateString(new Date()));
+                            contentValues.put("id", user.getUid());
+                            Uri uri = getContentResolver()
+                                    .insert(UserContract.UserEntry.CONTENT_URI, contentValues);
+                            Log.d(TAG, "Insert for new user returned " + uri);
 
-                            // Save the new user to Firebase
+                            // Save the new user to Firebase database (not auth)
                             Log.d(TAG, "Calling Utils to save new user to Firebase");
                             Utils.writeNewUserToFirebase(user.getUid(), user.getEmail());
 

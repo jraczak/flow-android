@@ -33,7 +33,7 @@
 
     <!-- PROFILE STRINGS -->
     <string name="nav_profile">Profile</string>
-    <string name="profile_header">Hello, %1$s! You have %2$d new messages.</string>
+    <string name="profile_header">Flow stats for %1$s</string>
     <!-- END PROFILE STRINGS -->
 
     <!-- CONTENT DESCRIPTION STRINGS -->

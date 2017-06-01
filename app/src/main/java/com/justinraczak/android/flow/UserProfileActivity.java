@@ -1,6 +1,7 @@
 package com.justinraczak.android.flow;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -8,15 +9,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.justinraczak.android.flow.data.UserContract;
 
 public class UserProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String LOG_TAG = UserProfileActivity.class.getSimpleName();
 
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
@@ -40,16 +45,28 @@ public class UserProfileActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
+
+        String[] userId = new String[]{mCurrentUser.getUid()};
+        Cursor cursor = getContentResolver().query(
+                UserContract.UserEntry.CONTENT_URI,
+                null,
+                null,
+                userId,
+                null,
+                null
+        );
+        String email = cursor.getString(cursor.getColumnIndex(UserContract.UserEntry.COLUMN_USER_EMAIL));
+        Log.d(LOG_TAG, "Used cursor to find user with email " + email);
+        cursor.close();
+
         if (mCurrentUser != null) {
             navNameTextView.setText("");
-            String headerFormat = getString(R.string.profile_header);
-            String headerString = String.format(headerFormat, mCurrentUser.getEmail(), 3);
-            navEmailTextView.setText(headerString);
+            navEmailTextView.setText(mCurrentUser.getEmail());
             navigationView.setNavigationItemSelectedListener(this);
 
-            //TextView signupDateTextView = (TextView) findViewById(R.id.profile_signup_date);
+            TextView emailLabelTextView = (TextView) findViewById(R.id.profile_email_label);
             TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
-            //signupDateTextView.setText(mCurrentUser.getUid());
+            emailLabelTextView.setText(String.format(getString(R.string.profile_header), mCurrentUser.getEmail()));
             emailTextView.setText(mCurrentUser.getEmail());
         }
     }

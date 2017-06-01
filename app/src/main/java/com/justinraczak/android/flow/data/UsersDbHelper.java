@@ -21,11 +21,11 @@ public class UsersDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_USERS_TABLE = "CREATE TABLE " +
-                UserContract.UsersEntry.TABLE_NAME + " (" +
-                UserContract.UsersEntry.COLUMN_USER_ID + " TEXT NOT NULL," +
-                UserContract.UsersEntry.COLUMN_SIGNUP_DATE + " TEXT NOT NULL," +
-                UserContract.UsersEntry.COLUMN_USER_EMAIL + " TEXT NOT NULL," +
-                UserContract.UsersEntry.COLUMN_USER_NAME + " TEXT" +
+                UserContract.UserEntry.TABLE_NAME + " (" +
+                UserContract.UserEntry.COLUMN_USER_ID + " TEXT NOT NULL," +
+                UserContract.UserEntry.COLUMN_SIGNUP_DATE + " TEXT NOT NULL," +
+                UserContract.UserEntry.COLUMN_USER_EMAIL + " TEXT NOT NULL," +
+                UserContract.UserEntry.COLUMN_USER_NAME + " TEXT" +
                 ");";
 
         db.execSQL(SQL_CREATE_USERS_TABLE);
@@ -33,7 +33,7 @@ public class UsersDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + UserContract.UsersEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + UserContract.UserEntry.TABLE_NAME);
         onCreate(db);
     }
 }
