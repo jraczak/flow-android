@@ -1,16 +1,19 @@
 package com.justinraczak.android.flow;
 
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -20,12 +23,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.justinraczak.android.flow.data.UserContract;
 
 public class UserProfileActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = UserProfileActivity.class.getSimpleName();
 
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
+
+    String[] mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,31 +52,33 @@ public class UserProfileActivity extends AppCompatActivity
         TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
 
+        getSupportLoaderManager().initLoader(0, null, this);
+
         if (mCurrentUser != null) {
-            String[] userId = new String[]{mCurrentUser.getUid()};
-            Cursor cursor = getContentResolver().query(
-                    UserContract.UserEntry.CONTENT_URI,
-                    null,
-                    UserContract.UserEntry.COLUMN_USER_ID + "=?",
-                    userId,
-                    null,
-                    null
-            );
-            DatabaseUtils.dumpCursor(cursor);
-            cursor.moveToFirst();
-            String email = cursor.getString(2);
-            String memberSince = cursor.getString(cursor.getColumnIndex("signupDate"));
-            Log.d(LOG_TAG, "Used cursor to find user with email " + email);
-            cursor.close();
+            mUserId = new String[]{mCurrentUser.getUid()};
+            //Cursor cursor = getContentResolver().query(
+            //        UserContract.UserEntry.CONTENT_URI,
+            //        null,
+            //        UserContract.UserEntry.COLUMN_USER_ID + "=?",
+            //        mUserId,
+            //        null,
+            //        null
+            //);
+            //DatabaseUtils.dumpCursor(cursor);
+            //cursor.moveToFirst();
+            //String email = cursor.getString(2);
+            //String memberSince = cursor.getString(cursor.getColumnIndex("signupDate"));
+            //Log.d(LOG_TAG, "Used cursor to find user with email " + email);
+            //cursor.close();
 
             navNameTextView.setText("");
             navEmailTextView.setText(mCurrentUser.getEmail());
             navigationView.setNavigationItemSelectedListener(this);
 
-            TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
-            emailTextView.setText(email);
-            TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
-            memberSinceTextView.setText(memberSince);
+            //TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
+            //emailTextView.setText(email);
+            //TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
+            //memberSinceTextView.setText(memberSince);
 
         }
     }
@@ -139,5 +146,34 @@ public class UserProfileActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                this,
+                UserContract.UserEntry.CONTENT_URI,
+                null,
+                UserContract.UserEntry.COLUMN_USER_ID + "=?",
+                mUserId,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Use the cursor we got to fill in the text views
+
+        DatabaseUtils.dumpCursor(data);
+        data.moveToFirst();
+        TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
+        emailTextView.setText(data.getString(data.getColumnIndex("email")));
+        TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
+        memberSinceTextView.setText(data.getString(data.getColumnIndex("signupDate")));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
