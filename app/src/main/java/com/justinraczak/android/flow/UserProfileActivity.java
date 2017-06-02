@@ -52,8 +52,6 @@ public class UserProfileActivity extends AppCompatActivity
         TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
 
-        getSupportLoaderManager().initLoader(0, null, this);
-
         if (mCurrentUser != null) {
             mUserId = new String[]{mCurrentUser.getUid()};
             //Cursor cursor = getContentResolver().query(
@@ -79,6 +77,8 @@ public class UserProfileActivity extends AppCompatActivity
             //emailTextView.setText(email);
             //TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
             //memberSinceTextView.setText(memberSince);
+
+            getSupportLoaderManager().initLoader(0, null, this);
 
         }
     }
