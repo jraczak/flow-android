@@ -47,30 +47,32 @@ public class UserProfileActivity extends AppCompatActivity
         TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
 
-        String[] userId = new String[]{mCurrentUser.getUid()};
-        Cursor cursor = getContentResolver().query(
-                UserContract.UserEntry.CONTENT_URI,
-                null,
-                UserContract.UserEntry.COLUMN_USER_ID + "=?",
-                userId,
-                null,
-                null
-        );
-        DatabaseUtils.dumpCursor(cursor);
-        cursor.moveToFirst();
-        String email = cursor.getString(2);
-        Log.d(LOG_TAG, "Used cursor to find user with email " + email);
-        cursor.close();
-
         if (mCurrentUser != null) {
+            String[] userId = new String[]{mCurrentUser.getUid()};
+            Cursor cursor = getContentResolver().query(
+                    UserContract.UserEntry.CONTENT_URI,
+                    null,
+                    UserContract.UserEntry.COLUMN_USER_ID + "=?",
+                    userId,
+                    null,
+                    null
+            );
+            DatabaseUtils.dumpCursor(cursor);
+            cursor.moveToFirst();
+            String email = cursor.getString(2);
+            String memberSince = cursor.getString(cursor.getColumnIndex("signupDate"));
+            Log.d(LOG_TAG, "Used cursor to find user with email " + email);
+            cursor.close();
+
             navNameTextView.setText("");
             navEmailTextView.setText(mCurrentUser.getEmail());
             navigationView.setNavigationItemSelectedListener(this);
 
-            TextView emailLabelTextView = (TextView) findViewById(R.id.profile_email_label);
             TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
-            emailLabelTextView.setText(String.format(getString(R.string.profile_header), mCurrentUser.getEmail()));
-            emailTextView.setText(mCurrentUser.getEmail());
+            emailTextView.setText(email);
+            TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
+            memberSinceTextView.setText(memberSince);
+
         }
     }
 

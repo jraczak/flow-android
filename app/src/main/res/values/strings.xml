@@ -35,6 +35,10 @@
     <!-- PROFILE STRINGS -->
     <string name="nav_profile">Profile</string>
     <string name="profile_header">Flow stats for %1$s</string>
+    <string name="profile_member_since_label">Member since</string>
+    <string name="profile_level_label">Flow mastery level</string>
+    <string name="profile_level">Novice</string>
+    <string name="cont_desc_profile_image">Profile image icon</string>
     <!-- END PROFILE STRINGS -->
 
     <!-- CONTENT DESCRIPTION STRINGS -->
