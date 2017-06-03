@@ -54,7 +54,7 @@
                     android:paddingTop="2dp"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="@string/profile_header"/>
+                    tools:text="05/31/2017"/>
                 <TextView
                     android:id="@+id/profile_level_label"
                     android:layout_width="wrap_content"
@@ -72,6 +72,74 @@
                     tools:text="Novice"/>
 
             </LinearLayout>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/profile_master_card"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_card"
+        tools:layout_editor_absoluteX="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/profile_mastery_card_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="@string/profile_mastery_card_label"/>
+                <TextView
+                    android:id="@+id/profile_mastery_card_novice_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    tools:text="Novice" />
+                <TextView
+                    android:id="@+id/profile_mastery_card_novice_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="0-50 tasks completed"/>
+                <TextView
+                    android:id="@+id/profile_mastery_card_seasoned_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    tools:text="Seasoned" />
+                <TextView
+                    android:id="@+id/profile_mastery_card_seasoned_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="51-100 tasks completed"/>
+            <TextView
+                android:id="@+id/profile_mastery_card_master_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                tools:text="Master" />
+            <TextView
+                android:id="@+id/profile_masteryCard_master_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="2dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="100+ tasks completed"/>
         </LinearLayout>
     </android.support.v7.widget.CardView>
     <!--<LinearLayout

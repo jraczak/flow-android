@@ -38,6 +38,7 @@
     <string name="profile_member_since_label">Member since</string>
     <string name="profile_level_label">Flow mastery level</string>
     <string name="profile_level">Novice</string>
+    <string name="profile_mastery_card_label">Mastery Levels</string>
     <string name="cont_desc_profile_image">Profile image icon</string>
     <!-- END PROFILE STRINGS -->
 

@@ -4,6 +4,7 @@ package com.justinraczak.android.flow;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
@@ -14,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -21,6 +23,18 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.justinraczak.android.flow.data.UserContract;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class UserProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -31,6 +45,13 @@ public class UserProfileActivity extends AppCompatActivity
     FirebaseUser mCurrentUser;
 
     String[] mUserId;
+
+    TextView mMasteryNoviceLabel;
+    TextView mMasteryNoviceValue;
+    TextView mMasterySeasonedLabel;
+    TextView mMasterySeasonedValue;
+    TextView mMasteryMasterLabel;
+    TextView mMasteryMasterValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +72,13 @@ public class UserProfileActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         TextView navNameTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         TextView navEmailTextView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
+
+        mMasteryNoviceLabel = (TextView) findViewById(R.id.profile_mastery_card_novice_label);
+        mMasteryNoviceValue = (TextView) findViewById(R.id.profile_mastery_card_novice_value);
+        mMasterySeasonedLabel = (TextView) findViewById(R.id.profile_mastery_card_seasoned_label);
+        mMasterySeasonedValue = (TextView) findViewById(R.id.profile_mastery_card_seasoned_value);
+        mMasteryMasterLabel = (TextView) findViewById(R.id.profile_mastery_card_master_label);
+        mMasteryMasterValue = (TextView) findViewById(R.id.profile_masteryCard_master_value);
 
         if (mCurrentUser != null) {
             mUserId = new String[]{mCurrentUser.getUid()};
@@ -79,6 +107,9 @@ public class UserProfileActivity extends AppCompatActivity
             //memberSinceTextView.setText(memberSince);
 
             getSupportLoaderManager().initLoader(0, null, this);
+
+            GetMasteryData getMasteryData = new GetMasteryData();
+            getMasteryData.execute();
 
         }
     }
@@ -175,5 +206,79 @@ public class UserProfileActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    private class GetMasteryData extends AsyncTask<Void, Void, String> {
+
+        HttpURLConnection httpURLConnection;
+        URL url = null;
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            try {
+                url = new URL("https://api.myjson.com/bins/p4xvx");
+            } catch (MalformedURLException e) {
+                Log.d(LOG_TAG, e.toString());
+                return e.toString();
+            }
+
+            try {
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("GET");
+                //httpURLConnection.setDoOutput(true);
+            } catch (IOException e) {
+                Log.d(LOG_TAG, e.toString());
+                return e.toString();
+            }
+
+            try {
+                int responseCode = httpURLConnection.getResponseCode();
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                        Log.d(LOG_TAG, "Read line was " + line);
+                    }
+                    return (result.toString());
+                } else {
+                    return ("operation unsuccessful");
+                }
+            } catch (IOException e) {
+                Log.d(LOG_TAG, e.toString());
+                return  e.toString();
+            } finally {
+                httpURLConnection.disconnect();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            String name = "name";
+            String description = "description";
+
+            try {
+                Log.d(LOG_TAG, result);
+                JSONObject jsonObject = new JSONObject(result);
+                Log.d(LOG_TAG, "Result of casting result string to json object is " + jsonObject);
+                JSONArray jsonArray = jsonObject.getJSONArray("levels");
+                Log.d(LOG_TAG, "JSONArray is " + jsonArray);
+                mMasteryNoviceLabel.setText(jsonArray.getJSONObject(0).getString(name));
+                mMasteryNoviceValue.setText(jsonArray.getJSONObject(0).getString(description));
+                mMasterySeasonedLabel.setText(jsonArray.getJSONObject(1).getString(name));
+                mMasterySeasonedValue.setText(jsonArray.getJSONObject(1).getString(description));
+                mMasteryMasterLabel.setText(jsonArray.getJSONObject(2).getString(name));
+                mMasteryMasterValue.setText(jsonArray.getJSONObject(2).getString(description));
+            } catch (JSONException e) {
+                Log.d(LOG_TAG, e.toString());
+            }
+        }
     }
 }
