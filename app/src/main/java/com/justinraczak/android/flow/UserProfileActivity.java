@@ -248,7 +248,7 @@ public class UserProfileActivity extends AppCompatActivity
                     }
                     return (result.toString());
                 } else {
-                    return ("operation unsuccessful");
+                    return ("Failed to fetch the mastery JSON data");
                 }
             } catch (IOException e) {
                 Log.d(LOG_TAG, e.toString());
