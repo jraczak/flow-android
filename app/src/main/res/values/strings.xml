@@ -25,6 +25,8 @@
     <string name="today">Today</string>
     <string name="nav_tasks">Tasks</string>
     <string name="cont_desc_add_new_task">Add a new task</string>
+    <string name="tapped">Tapped </string>
+    <string name="added_to_tasks"> was added to your tasks</string>
     <!-- END TASK VIEW STRINGS -->
 
     <!-- NEW TASK FRAGMENT STRINGS -->
@@ -63,6 +65,8 @@
         completions."
     </string>
     <string name="title_activity_task_view">Tasks</string>
+    <string name="account_creation_failed">Account creation failed</string>
+    <string name="sign_in_failed">Unfortunately, sign in failed</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

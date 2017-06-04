@@ -172,7 +172,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                            // Creation failed, handle the error
                             Log.w(TAG, "createUserWithEmail: failed");
                             //TODO: Figure out how to not throw this when user is signed in to existing account, not failed
-                            Toast.makeText(getApplicationContext(), "Account creation failed", Toast.LENGTH_LONG)
+                            Toast.makeText(getApplicationContext(), getString(R.string.account_creation_failed), Toast.LENGTH_LONG)
                                     .show();
                         }
                     }
@@ -381,7 +381,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         String email = mEmailView.getText().toString();
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError("Required.");
+            mEmailView.setError(getString(R.string.error_field_required));
             valid = false;
         } else {
             mEmailView.setError(null);
@@ -389,7 +389,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         String password = mPasswordView.getText().toString();
         if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError("Required.");
+            mPasswordView.setError(getString(R.string.error_field_required));
             valid = false;
         } else {
             mPasswordView.setError(null);
@@ -448,7 +448,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             }
                             if (!task.isSuccessful()) {
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
-                                Toast.makeText(LoginActivity.this, "Unfortunately, sign in failed",
+                                Toast.makeText(LoginActivity.this, getString(R.string.sign_in_failed),
                                         Toast.LENGTH_LONG).show();
                             }
                         }

@@ -228,7 +228,7 @@ public class TaskViewActivity extends AppCompatActivity
         if (!textFieldEmpty(mNewTaskFragment)) {
             getSupportFragmentManager().beginTransaction().remove(mNewTaskFragment).commit();
             mNewTaskFragment = null;
-            Toast.makeText(getApplicationContext(), "Created " + taskName + " task", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), taskName + getString(R.string.added_to_tasks), Toast.LENGTH_SHORT).show();
             Task task = new Task(FirebaseAuth.getInstance().getCurrentUser().getUid(),
                     Task.getNewAutoIncrementId(),
                     taskName,

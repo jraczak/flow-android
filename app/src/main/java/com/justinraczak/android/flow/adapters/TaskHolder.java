@@ -36,7 +36,7 @@ public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickL
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(LOG_TAG, "Task " + task.name + " complete state is currently " + task.complete + "; toggling");
+                Log.d(LOG_TAG, task.name + " complete state is currently " + task.complete + "; attempting to toggle");
                 task.toggleCompleteState();
                 Log.d(LOG_TAG, "Task complete state is + " + task.complete + " after toggle");
                 setUiCompleteState();
@@ -60,7 +60,7 @@ public class TaskHolder extends RecyclerView.ViewHolder implements View.OnClickL
     @Override
     public void onClick(View v) {
         if (this.task != null) {
-            Toast.makeText(this.context, "Tapped " + task.name + "task", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.context, context.getResources().getString(R.string.tapped) + task.name, Toast.LENGTH_SHORT).show();
         }
     }
 
