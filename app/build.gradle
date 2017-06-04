@@ -10,7 +10,7 @@ android {
         udacity {
             keyAlias 'udacity_release_key'
             keyPassword 'udacity123'
-            storeFile file('$rootDir/udacity_keystore.jks')
+            storeFile file("$rootDir/udacity_keystore.jks")
             storePassword 'udacity123'
         }
     }
