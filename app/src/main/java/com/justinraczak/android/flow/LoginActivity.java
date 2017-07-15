@@ -39,9 +39,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.justinraczak.android.flow.data.UserContract;
 import com.justinraczak.android.flow.utils.Utils;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -50,7 +55,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -67,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserLoginTask mUserLoginTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -87,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Check if user's first time and send them to welcome if so
+        // Check if user's first time and send them to welcome screen if so
         // TODO: Also add this to signed in first screen for when login is bypassed
         isUserFirstTime = Boolean.valueOf(Utils.readSharedSetting(LoginActivity.this, PREFS_USER_FIRST_TIME, "true"));
 
@@ -138,20 +143,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void createAccount(String email, String password) {
-        Log.d(TAG, "creating account for " + email);
+        Log.d(LOG_TAG, "creating account for " + email);
         if (!validateForm()) {
             return;
         }
 
-        Log.d(TAG, "About to call createUserWithEmailAndPassword");
+        Log.d(LOG_TAG, "About to call createUserWithEmailAndPassword");
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "onComplete called");
+                        Log.d(LOG_TAG, "onComplete called");
                         if (task.isSuccessful()) {
                             // Creation successful, sign the user into the app
-                            Log.d(TAG, "createUserWithEmail: successful");
+                            Log.d(LOG_TAG, "createUserWithEmail: successful");
                             FirebaseUser user = mAuth.getCurrentUser();
                             // Store the new user to the local database
                             ContentValues contentValues = new ContentValues();
@@ -160,17 +165,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             contentValues.put("id", user.getUid());
                             Uri uri = getContentResolver()
                                     .insert(UserContract.UserEntry.CONTENT_URI, contentValues);
-                            Log.d(TAG, "Insert for new user returned " + uri);
+                            Log.d(LOG_TAG, "Insert for new user returned " + uri);
 
                             // Save the new user to Firebase database (not auth)
-                            Log.d(TAG, "Calling Utils to save new user to Firebase");
+                            Log.d(LOG_TAG, "Calling Utils to save new user to Firebase");
                             Utils.writeNewUserToFirebase(user.getUid(), user.getEmail());
 
                             Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
                             startActivity(dayViewIntent);
                         } else {
                            // Creation failed, handle the error
-                            Log.w(TAG, "createUserWithEmail: failed");
+                            Log.w(LOG_TAG, "createUserWithEmail: failed");
                             //TODO: Figure out how to not throw this when user is signed in to existing account, not failed
                             Toast.makeText(getApplicationContext(), getString(R.string.account_creation_failed), Toast.LENGTH_LONG)
                                     .show();
@@ -229,7 +234,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
+        if (mUserLoginTask != null) {
             return;
         }
 
@@ -270,8 +275,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            mUserLoginTask = new UserLoginTask(email, password);
+            mUserLoginTask.execute((Void) null);
         }
     }
 
@@ -406,6 +411,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        URL url = null;
+        HttpsURLConnection httpsURLConnection;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -414,7 +421,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
             //try {
             //    // Simulate network access.
@@ -431,23 +437,56 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //    }
             //}
 
+            // TODO: Attempt sign in with API
+            try {
+                url = new URL("https://pure-caverns-40977.herokuapp.com/auth/sign_in");
+            } catch (MalformedURLException e) {
+                Log.d(LOG_TAG, e.toString());
+                return false;
+            }
+
+            try {
+                httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                httpsURLConnection.setRequestMethod("POST");
+            } catch (IOException e) {
+                Log.d(LOG_TAG, e.toString());
+                return false;
+            }
+
+            httpsURLConnection.setRequestProperty("email", mEmail);
+            httpsURLConnection.setRequestProperty("password", mPassword);
+
+            try {
+                int responseCode = httpsURLConnection.getResponseCode();
+                Log.d(LOG_TAG, "HTTP Response code is: " + responseCode);
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    // Call successful, sign the user in and save the access tokens
+
+                } else {
+                    Log.d(LOG_TAG, "Something went wrong with the sign in");
+                    return false;
+                }
+            }
+
 
 
             // TODO: register the new account here.
+            // TODO: Remove this legacy code
             createAccount(mEmail, mPassword);
 
             mAuth.signInWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                            Log.d(LOG_TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
                             if (task.isSuccessful()) {
                                 Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
                                 startActivity(dayViewIntent);
                             }
                             if (!task.isSuccessful()) {
-                                Log.w(TAG, "signInWithEmail:failed", task.getException());
+                                Log.w(LOG_TAG, "signInWithEmail:failed", task.getException());
                                 Toast.makeText(LoginActivity.this, getString(R.string.sign_in_failed),
                                         Toast.LENGTH_LONG).show();
                             }
@@ -459,7 +498,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
+            mUserLoginTask = null;
             showProgress(false);
 
             //if (success) {
@@ -476,7 +515,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
+            mUserLoginTask = null;
             showProgress(false);
         }
     }

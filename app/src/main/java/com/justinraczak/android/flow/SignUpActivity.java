@@ -1,5 +1,6 @@
 package com.justinraczak.android.flow;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -26,6 +29,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText mEmailEditText;
     EditText mPasswordEditText;
     Button mSignUpButton;
+    TextView mSignInLink;
 
     String mEmail;
     String mPassword;
@@ -41,11 +45,21 @@ public class SignUpActivity extends AppCompatActivity {
         mEmailEditText = (EditText) findViewById(R.id.signup_email_edittext);
         mPasswordEditText = (EditText) findViewById(R.id.signup_password_edittext);
         mSignUpButton = (Button) findViewById(R.id.button_sign_up);
+        mSignInLink = (TextView) findViewById(R.id.signup_sign_in_link);
 
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createAccount();
+            }
+        });
+
+        mSignInLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = new Intent(getApplicationContext(), LoginActivity.class);
+                //TODO: Send the form field values through in case the user has already filled them in
+                startActivity(signInIntent);
             }
         });
 
@@ -104,6 +118,15 @@ public class SignUpActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "HTTP response code is " + responseCode);
 
                 if (responseCode == HttpsURLConnection.HTTP_OK) {
+
+                    // TODO: Create the user in the local database and create a session to sign them in
+
+                    Map<String, List<String>> responseHeader = httpsURLConnection.getHeaderFields();
+                    Log.d(LOG_TAG, "Header fields: " + responseHeader);
+                    for (Map.Entry<String, List<String>> entry : responseHeader.entrySet()) {
+                        Log.d(LOG_TAG, entry.getKey() + " : " + entry.getValue());
+                    }
+
                     InputStream responseBody = httpsURLConnection.getInputStream();
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(responseBody));
 
