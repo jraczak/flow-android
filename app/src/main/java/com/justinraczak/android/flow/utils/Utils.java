@@ -53,11 +53,12 @@ public class Utils {
         return sharedPref.getString(settingName, defaultValue);
     }
 
-    public static void writeNewUserToFirebase(String id, String email) {
+    // TODO: Remove this helper method
+    public static void writeNewUserToFirebase(int id, String email, String name, String uid) {
         Log.d(TAG, "Attempting to save new user to Firebase");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        User user = new User(id, email);
-        databaseReference.child("users").child(id).setValue(user);
+        User user = new User(id, email, name, uid);
+        //databaseReference.child("users").child(id).setValue(user);
     }
 
     public static void writeNewTaskToFirebase(Task task) {

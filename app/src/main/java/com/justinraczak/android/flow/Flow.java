@@ -7,6 +7,7 @@ import com.justinraczak.android.flow.data.Migration;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import io.realm.DynamicRealm;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -27,9 +28,14 @@ public class Flow extends Application {
         Realm.init(this);
         RealmConfiguration defaultConfig = new RealmConfiguration.Builder()
                 .name("flow-android.realm")
-                .schemaVersion(3)
+                .schemaVersion(7)
                 .migration(new Migration())
                 .build();
+
+        // Userful snippet for logging the current realm version on a device
+        //DynamicRealm dynRealm = DynamicRealm.getInstance(defaultConfig);
+        //Log.d("Application realm check", String.valueOf(dynRealm.getVersion()));//this will return the existing schema version
+        //dynRealm.close();
 
         //try {
         //    Realm.migrateRealm(defaultConfig, new Migration());

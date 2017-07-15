@@ -37,9 +37,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.justinraczak.android.flow.data.UserContract;
+import com.justinraczak.android.flow.models.User;
 import com.justinraczak.android.flow.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,6 +54,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -74,6 +84,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private UserLoginTask mUserLoginTask = null;
 
+    private Realm mRealm;
+
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -91,6 +103,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mRealm = Realm.getDefaultInstance();
 
         // Check if user's first time and send them to welcome screen if so
         // TODO: Also add this to signed in first screen for when login is bypassed
@@ -168,8 +182,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Log.d(LOG_TAG, "Insert for new user returned " + uri);
 
                             // Save the new user to Firebase database (not auth)
+                            // TODO: REmove this when the new flow is working
                             Log.d(LOG_TAG, "Calling Utils to save new user to Firebase");
-                            Utils.writeNewUserToFirebase(user.getUid(), user.getEmail());
+                            //Utils.writeNewUserToFirebase(user.getUid(), user.getEmail(), "Justin", "uid");
 
                             Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
                             startActivity(dayViewIntent);
@@ -422,6 +437,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
 
+            String jsonResponseString;
+
+            // User attributes to obtain
+            String email;
+            String name;
+            String uid;
+            int id;
+
             //try {
             //    // Simulate network access.
             //    Thread.sleep(2000);
@@ -439,7 +462,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             // TODO: Attempt sign in with API
             try {
-                url = new URL("https://pure-caverns-40977.herokuapp.com/auth/sign_in");
+                url = new URL("https://pure-caverns-40977.herokuapp.com/api/auth/sign_in");
             } catch (MalformedURLException e) {
                 Log.d(LOG_TAG, e.toString());
                 return false;
@@ -461,12 +484,49 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.d(LOG_TAG, "HTTP Response code is: " + responseCode);
 
                 if (responseCode == HttpsURLConnection.HTTP_OK) {
-                    // Call successful, sign the user in and save the access tokens
+
+                    // Call successful, read the response values and sign the user in
+
+                    try {
+                        InputStream responseBody = httpsURLConnection.getInputStream();
+                        BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody));
+
+                        StringBuilder stringResult = new StringBuilder();
+                        String responseLine;
+                        while ((responseLine = responseReader.readLine()) != null) {
+                            stringResult.append(responseLine);
+                            Log.d(LOG_TAG, "Read line was: " + responseLine);
+                        }
+                        jsonResponseString = stringResult.toString();
+                        JSONObject jsonResponseObject = new JSONObject(jsonResponseString);
+                        JSONObject jsonDataObject = jsonResponseObject.getJSONObject("data");
+                        email = jsonDataObject.getString("email");
+                        uid = jsonDataObject.getString("uid");
+                        name = jsonDataObject.getString("name");
+                        id = jsonDataObject.getInt("id");
+                        Log.d(LOG_TAG, "Fetched email address " + email + " from the API response");
+                        Log.d(LOG_TAG, jsonDataObject.toString());
+                    } catch (IOException e) {
+                        Log.d(LOG_TAG, e.toString());
+                        return false;
+                    } catch (JSONException e) {
+                        Log.d(LOG_TAG, e.toString());
+                        return false;
+                    }
+
+                    //TODO: Need to read from the buffer here to pass correct values
+                    User userForSession = findOrCreateUser(id, uid, email, name);
+
 
                 } else {
                     Log.d(LOG_TAG, "Something went wrong with the sign in");
                     return false;
                 }
+            } catch (IOException e) {
+                Log.d(LOG_TAG, e.toString());
+                return false;
+            } finally {
+                httpsURLConnection.disconnect();
             }
 
 
@@ -511,6 +571,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
+
+            // TODO: Update the session values from the response headers
         }
 
         @Override
@@ -518,6 +580,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mUserLoginTask = null;
             showProgress(false);
         }
+    }
+
+    public User findOrCreateUser(int id, String uid, String email, String name) {
+        User user = null;
+
+        mRealm = Realm.getDefaultInstance();
+        // Search for an existing user with the uid provided by the API
+        RealmResults<User> userRealmResults = mRealm.where(User.class)
+                .equalTo("apiUid", uid)
+                .findAll();
+        if (userRealmResults.size() > 1) {
+            Log.e(LOG_TAG, "Error: more than 1 local user found with uid " + uid);
+            user = null;
+        }
+
+        if (userRealmResults.size() == 1) {
+            Log.d(LOG_TAG, "One user found with uid " + uid);
+            user = userRealmResults.first();
+        } else if (userRealmResults.isEmpty()) {
+
+            // TODO: Always check that the uid is unique on the device
+            // No user found with this UID, create it
+            Log.d(LOG_TAG, "No existing user found with uid " + uid + "; creating new user");
+            User newUser = new User(id, email, name, uid);
+            mRealm.beginTransaction();
+            user = mRealm.copyToRealm(newUser);
+            mRealm.commitTransaction();
+            Log.d(LOG_TAG, "Created user with email " + user.getEmail() + " and uid of " + user.getApiUid());
+        }
+        return user;
     }
 }
 
