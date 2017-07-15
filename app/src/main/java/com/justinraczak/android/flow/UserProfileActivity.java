@@ -15,9 +15,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +38,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class UserProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -110,6 +115,16 @@ public class UserProfileActivity extends AppCompatActivity
 
             GetMasteryData getMasteryData = new GetMasteryData();
             getMasteryData.execute();
+
+            Button apiButton = (Button) findViewById(R.id.button_test_api_call);
+            apiButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    GetTasksFromApi getTasksFromApi = new GetTasksFromApi();
+                    getTasksFromApi.execute();
+                }
+            });
+
 
         }
     }
@@ -198,9 +213,9 @@ public class UserProfileActivity extends AppCompatActivity
         DatabaseUtils.dumpCursor(data);
         data.moveToFirst();
         TextView emailTextView = (TextView) findViewById(R.id.profile_user_email);
-        emailTextView.setText(data.getString(data.getColumnIndex("email")));
+        //emailTextView.setText(data.getString(data.getColumnIndex("email")));
         TextView memberSinceTextView = (TextView) findViewById(R.id.profile_member_since);
-        memberSinceTextView.setText(data.getString(data.getColumnIndex("signupDate")));
+        //memberSinceTextView.setText(data.getString(data.getColumnIndex("signupDate")));
     }
 
     @Override
@@ -279,6 +294,80 @@ public class UserProfileActivity extends AppCompatActivity
             } catch (JSONException e) {
                 Log.d(LOG_TAG, e.toString());
             }
+        }
+    }
+
+    private class GetTasksFromApi extends AsyncTask<Void, Void, String> {
+
+        HttpsURLConnection httpsURLConnection;
+        URL url = null;
+
+        @Override
+        protected String doInBackground(Void... params) {
+
+            String jsonString = "Empty, call failed";
+
+            try {
+                url = new URL("https://pure-caverns-40977.herokuapp.com/api/tasks");
+            } catch (MalformedURLException e) {
+                Log.d("API", e.toString());
+                return e.toString();
+            }
+
+            try {
+                httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                httpsURLConnection.setRequestMethod("GET");
+            } catch (IOException e) {
+                Log.d("API", e.toString());
+                return e.toString();
+            }
+
+            httpsURLConnection.setRequestProperty("access-token", "R3bXBAHLza_oEQ76Kc7K3Q");
+            httpsURLConnection.setRequestProperty("token-type", "Bearer");
+            httpsURLConnection.setRequestProperty("uid", "jraczak@gmail.com");
+            httpsURLConnection.setRequestProperty("client", "zwrBNiA8GJvX0s5EyMDL_g");
+            httpsURLConnection.setRequestProperty("expiry", "1501279208");
+
+            try {
+                int responseCode = httpsURLConnection.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    //InputStream responseBody = httpsURLConnection.getInputStream();
+                    //InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
+//
+                    //JsonReader jsonReader = new JsonReader(responseBodyReader);
+                    //jsonString = jsonReader.toString();
+                    //Log.d("API", "JSON reader content is: " + jsonString);
+                    //jsonReader.close();
+
+                    InputStream responseBody = httpsURLConnection.getInputStream();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(responseBody));
+
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                        Log.d(LOG_TAG, "Read line was " + line);
+                    }
+                    jsonString = result.toString();
+                    return jsonString;
+
+                } else {
+                    return ("Failed to fetch the API data");
+                }
+            } catch (IOException e) {
+                Log.d("API", e.toString());
+                return e.toString();
+            } finally {
+                httpsURLConnection.disconnect();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            TextView jsonTextView = (TextView) findViewById(R.id.profile_api_test_textview);
+            jsonTextView.setText(result);
         }
     }
 }

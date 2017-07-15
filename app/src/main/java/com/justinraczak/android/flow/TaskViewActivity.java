@@ -195,6 +195,10 @@ public class TaskViewActivity extends AppCompatActivity
             Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
             startActivity(profileIntent);
 
+        } else if (id == R.id.nav_signup) {
+            Intent signupIntent = new Intent(getApplicationContext(), SignUpActivity.class);
+            startActivity(signupIntent);
+
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
