@@ -4,10 +4,10 @@ import android.app.Application;
 import android.util.Log;
 
 import com.justinraczak.android.flow.data.Migration;
+import com.justinraczak.android.flow.models.UserSession;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import io.realm.DynamicRealm;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -19,6 +19,8 @@ public class Flow extends Application {
 
     private Realm mRealm;
     //private FirebaseAnalytics mFirebaseAnalytics;
+
+    private UserSession currentUserSession;
 
     @Override
     public void onCreate() {
@@ -57,4 +59,14 @@ public class Flow extends Application {
     //public FirebaseAnalytics getmFirebaseAnalytics() {
     //    return mFirebaseAnalytics;
     //}
+
+
+    public UserSession getCurrentUserSession() {
+        return currentUserSession;
+    }
+
+    public void setCurrentUserSession(UserSession currentUserSession) {
+        this.currentUserSession = currentUserSession;
+        Log.d("Application", "Set current user session to " + currentUserSession);
+    }
 }

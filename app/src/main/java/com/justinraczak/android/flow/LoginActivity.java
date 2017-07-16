@@ -3,6 +3,7 @@ package com.justinraczak.android.flow;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
 import android.content.CursorLoader;
@@ -38,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.justinraczak.android.flow.data.UserContract;
 import com.justinraczak.android.flow.models.User;
+import com.justinraczak.android.flow.models.UserSession;
 import com.justinraczak.android.flow.utils.Utils;
 
 import org.json.JSONException;
@@ -84,6 +86,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private UserLoginTask mUserLoginTask = null;
 
+    // References for API connection and headers
+    private HttpsURLConnection mHttpsUrlConnection;
+    private String mAccessToken;
+    private String mTokenType;
+    private String mClient;
+    private String mExpiry;
+
     private Realm mRealm;
 
     // UI references.
@@ -118,6 +127,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         // If there is a current user, send them through to the app
+        //TODO: Switch this to check for a valid user session
         mAuth = FirebaseAuth.getInstance();
         // Check for a signed in user
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -162,6 +172,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return;
         }
 
+        //TODO: Get this functionality into new onPostExecute and remove this
         Log.d(LOG_TAG, "About to call createUserWithEmailAndPassword");
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -422,12 +433,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
+
+        String apiUid = null;
 
         private final String mEmail;
         private final String mPassword;
         URL url = null;
-        HttpsURLConnection httpsURLConnection;
+        HttpsURLConnection mHttpsUrlConnection;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -435,7 +448,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
 
             String jsonResponseString;
 
@@ -465,30 +478,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 url = new URL("https://pure-caverns-40977.herokuapp.com/api/auth/sign_in");
             } catch (MalformedURLException e) {
                 Log.d(LOG_TAG, e.toString());
-                return false;
+                return apiUid;
             }
 
             try {
-                httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                httpsURLConnection.setRequestMethod("POST");
+                mHttpsUrlConnection = (HttpsURLConnection) url.openConnection();
+                mHttpsUrlConnection.setRequestMethod("POST");
             } catch (IOException e) {
                 Log.d(LOG_TAG, e.toString());
-                return false;
+                return apiUid;
             }
 
-            httpsURLConnection.setRequestProperty("email", mEmail);
-            httpsURLConnection.setRequestProperty("password", mPassword);
+            mHttpsUrlConnection.setRequestProperty("email", mEmail);
+            mHttpsUrlConnection.setRequestProperty("password", mPassword);
 
             try {
-                int responseCode = httpsURLConnection.getResponseCode();
+                int responseCode = mHttpsUrlConnection.getResponseCode();
                 Log.d(LOG_TAG, "HTTP Response code is: " + responseCode);
 
                 if (responseCode == HttpsURLConnection.HTTP_OK) {
 
                     // Call successful, read the response values and sign the user in
 
+                    // Set the header values so they're accessible back in the UI thread
+                    mAccessToken = mHttpsUrlConnection.getHeaderField("access-token");
+                    mTokenType = mHttpsUrlConnection.getHeaderField("token-type");
+                    mClient = mHttpsUrlConnection.getHeaderField("client");
+                    mExpiry= mHttpsUrlConnection.getHeaderField("expiry");
+
                     try {
-                        InputStream responseBody = httpsURLConnection.getInputStream();
+                        InputStream responseBody = mHttpsUrlConnection.getInputStream();
                         BufferedReader responseReader = new BufferedReader(new InputStreamReader(responseBody));
 
                         StringBuilder stringResult = new StringBuilder();
@@ -508,58 +527,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         Log.d(LOG_TAG, jsonDataObject.toString());
                     } catch (IOException e) {
                         Log.d(LOG_TAG, e.toString());
-                        return false;
+                        return apiUid;
                     } catch (JSONException e) {
                         Log.d(LOG_TAG, e.toString());
-                        return false;
+                        return apiUid;
                     }
-
-                    //TODO: Need to read from the buffer here to pass correct values
                     User userForSession = findOrCreateUser(id, uid, email, name);
-
+                    apiUid = userForSession.getApiUid();
 
                 } else {
                     Log.d(LOG_TAG, "Something went wrong with the sign in");
-                    return false;
+                    return apiUid;
                 }
             } catch (IOException e) {
                 Log.d(LOG_TAG, e.toString());
-                return false;
+                return apiUid;
             } finally {
-                httpsURLConnection.disconnect();
+                mHttpsUrlConnection.disconnect();
             }
 
-
-
-            // TODO: register the new account here.
-            // TODO: Remove this legacy code
-            createAccount(mEmail, mPassword);
-
-            mAuth.signInWithEmailAndPassword(mEmail, mPassword)
-                    .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(LOG_TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                            if (task.isSuccessful()) {
-                                Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
-                                startActivity(dayViewIntent);
-                            }
-                            if (!task.isSuccessful()) {
-                                Log.w(LOG_TAG, "signInWithEmail:failed", task.getException());
-                                Toast.makeText(LoginActivity.this, getString(R.string.sign_in_failed),
-                                        Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-
-            return true;
+            return apiUid;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final String apiUid) {
             mUserLoginTask = null;
             showProgress(false);
+            mRealm = Realm.getDefaultInstance();
+            User user = mRealm.where(User.class).equalTo("apiUid", apiUid).findAll().first();
+
+            UserSession session;
 
             //if (success) {
             //    Intent dayViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
@@ -567,9 +564,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //TODO: Figure out how to get finish working without breaking the control flow
                 //finish();
             //} else {
-            if (!success) {
+            if (user == null) {
+                session = null;
+                Log.d(LOG_TAG, "Signing user in failed");
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            } else {
+                Log.d(LOG_TAG, "Creating new session for user " + user.getApiUid());
+                session = createNewUserSession(user);
+            }
+
+            if (session != null) {
+                Intent taskViewIntent = new Intent(getApplicationContext(), TaskViewActivity.class);
+                startActivity(taskViewIntent);
+                Flow flowApplication = (Flow) getApplication();
+                flowApplication.setCurrentUserSession(session);
             }
 
             // TODO: Update the session values from the response headers
@@ -610,6 +619,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.d(LOG_TAG, "Created user with email " + user.getEmail() + " and uid of " + user.getApiUid());
         }
         return user;
+    }
+
+    public UserSession createNewUserSession(User user) {
+        Log.d(LOG_TAG, "Extracting HTTPS header values");
+
+
+        Log.d(LOG_TAG, "Creating user session with user and header values");
+        UserSession newUserSession = new UserSession(user, user.getApiUid(),
+                mAccessToken,
+                mClient,
+                mTokenType,
+                mExpiry);
+        Log.d(LOG_TAG, "User session is " + newUserSession);
+        // Clear out the API header values since they're stored in the session now
+        mAccessToken = null;
+        mClient = null;
+        mTokenType = null;
+        mExpiry = null;
+
+        return newUserSession;
     }
 }
 

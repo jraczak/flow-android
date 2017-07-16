@@ -332,7 +332,7 @@ public class UserProfileActivity extends AppCompatActivity
                 int responseCode = httpsURLConnection.getResponseCode();
 
                 if (responseCode == HttpsURLConnection.HTTP_OK) {
-                    //InputStream responseBody = httpsURLConnection.getInputStream();
+                    //InputStream responseBody = mHttpsUrlConnection.getInputStream();
                     //InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
 //
                     //JsonReader jsonReader = new JsonReader(responseBodyReader);
